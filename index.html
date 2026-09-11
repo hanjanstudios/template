@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Atelier — Minimalist Portfolio Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-cream: #FAF8F5;
+      --panel-bg: #FFFFFF;
+      --text-dark: #1F1E1C;
+      --text-muted: #73706A;
+      --border-subtle: #E8E4DC;
+      --accent-coral: #E07A5F;
+      --accent-sage: #819885;
+      --accent-sun: #F2CC8F;
+      --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.04);
+      --font-display: 'Italiana', serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-dark);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Bar */
+    header {
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+    }
+
+    .brand h1 {
+      font-family: var(--font-display);
+      font-size: 1.75rem;
+      letter-spacing: 0.05em;
+      font-weight: normal;
+    }
+
+    .brand span {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn {
+      cursor: pointer;
+      border: 1px solid var(--text-dark);
+      background: transparent;
+      padding: 0.6rem 1.25rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 500;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--text-dark);
+      color: #FFF;
+    }
+
+    .btn-primary:hover {
+      background: #383632;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-cream);
+    }
+
+    /* Main Grid */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      height: calc(100vh - 69px);
+      overflow: hidden;
+    }
+
+    @media (max-width: 1024px) {
+      main {
+        grid-template-columns: 1fr;
+        height: auto;
+        overflow: visible;
+      }
+    }
+
+    /* Sidebar Editor */
+    .editor-pane {
+      background: var(--panel-bg);
+      border-right: 1px solid var(--border-subtle);
+      overflow-y: auto;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    input, textarea, select {
+      font-family: var(--font-body);
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-cream);
+      padding: 0.75rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      color: var(--text-dark);
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--text-dark);
+      background: #FFF;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    /* Project Cards in Editor */
+    .project-card-form {
+      border: 1px solid var(--border-subtle);
+      padding: 1rem;
+      border-radius: 12px;
+      background: #FDFAF6;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .remove-project-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: transparent;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .remove-project-btn:hover {
+      color: #c00;
+    }
+
+    /* Preview Canvas */
+    .preview-pane {
+      background: #EDE8DF;
+      padding: 2.5rem;
+      overflow-y: auto;
+      display: flex;
+      justify-content: center;
+    }
+
+    .preview-frame {
+      width: 100%;
+      max-width: 960px;
+      background: #FFF;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    /* Dynamic Portfolio Styles inside Frame */
+    .pf-header {
+      padding: 5rem 4rem 3rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    .pf-tagline {
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--accent-coral);
+    }
+
+    .pf-name {
+      font-family: var(--font-display);
+      font-size: 4rem;
+      line-height: 1.05;
+      font-weight: 400;
+      letter-spacing: -0.01em;
+    }
+
+    .pf-bio {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      color: #4A4843;
+      max-width: 620px;
+      font-weight: 300;
+    }
+
+    .pf-links {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .pf-links a {
+      color: var(--text-dark);
+      text-decoration: none;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-bottom: 1px solid var(--text-dark);
+      padding-bottom: 2px;
+      transition: opacity 0.2s;
+    }
+    .pf-links a:hover {
+      opacity: 0.6;
+    }
+
+    .pf-gallery {
+      padding: 2rem 4rem 6rem 4rem;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 3rem 2.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .pf-header, .pf-gallery {
+        padding: 2rem;
+      }
+      .pf-gallery {
+        grid-template-columns: 1fr;
+      }
+      .pf-name {
+        font-size: 2.8rem;
+      }
+    }
+
+    .pf-item {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .pf-item:hover {
+      transform: translateY(-4px);
+    }
+
+    .pf-img-wrapper {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: #F3F1ED;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .pf-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .pf-item:hover .pf-img-wrapper img {
+      transform: scale(1.03);
+    }
+
+    .pf-item-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .pf-item-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+    }
+
+    .pf-item-category {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+    }
+
+    .pf-item-desc {
+      font-size: 0.88rem;
+      line-height: 1.5;
+      color: #615E58;
+    }
+
+    /* Style Presets */
+    body.theme-warm {
+      --accent-coral: #C9654B;
+      --bg-cream: #FAF6F0;
+    }
+    body.theme-sage {
+      --accent-coral: #648169;
+      --bg-cream: #F5F7F5;
+    }
+    body.theme-monochrome {
+      --accent-coral: #111111;
+      --bg-cream: #F5F5F5;
+    }
+  </style>
+</head>
+<body class="theme-warm">
+
+  <header>
+    <div class="brand">
+      <h1>Atelier</h1>
+      <span>Portfolio Engine</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="previewModeBtn">Preview Fullscreen</button>
+      <button class="btn btn-primary" id="exportBtn">Export Static Site</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Left: Realtime Editor Controls -->
+    <aside class="editor-pane">
+      
+      <div>
+        <h2 class="section-title">Visual Aesthetic</h2>
+        <div class="form-group">
+          <label>Theme Palette</label>
+          <select id="themeSelect">
+            <option value="theme-warm">Terracotta & Warm Cream</option>
+            <option value="theme-sage">Earthy Sage & Bone</option>
+            <option value="theme-monochrome">Gallery Noir & Pure Paper</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="section-title">Artist & Creator Profile</h2>
+        <div class="form-group">
+          <label>Category / Headline</label>
+          <input type="text" id="inputTagline" value="Multidisciplinary Visual Artist & Designer" />
+        </div>
+        <div class="form-group">
+          <label>Name or Studio Title</label>
+          <input type="text" id="inputName" value="Studio Alouette" />
+        </div>
+        <div class="form-group">
+          <label>Statement / Bio</label>
+          <textarea id="inputBio">Curating spatial interventions, custom objects, and experimental installations inspired by coastal light, raw textures, and architectural stillness.</textarea>
+        </div>
+        <div class="form-group">
+          <label>Contact Email or Link</label>
+          <input type="text" id="inputContact" value="hello@studioalouette.com" />
+        </div>
+      </div>
+
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 class="section-title" style="margin: 0;">Portfolio Works</h2>
+          <button class="btn btn-secondary" style="padding: 0.3rem 0.8rem; font-size: 0.7rem;" id="addProjectBtn">+ Add Piece</button>
+        </div>
+        
+        <div id="projectsEditorContainer">
+          <!-- Dynamically populated project cards -->
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Right: Live Canvas Preview -->
+    <section class="preview-pane">
+      <div class="preview-frame" id="portfolioCanvas">
+        <header class="pf-header">
+          <p class="pf-tagline" id="liveTagline">Multidisciplinary Visual Artist & Designer</p>
+          <h1 class="pf-name" id="liveName">Studio Alouette</h1>
+          <p class="pf-bio" id="liveBio">Curating spatial interventions, custom objects, and experimental installations inspired by coastal light, raw textures, and architectural stillness.</p>
+          <div class="pf-links">
+            <a href="#" id="liveContactLink">Get In Touch</a>
+          </div>
+        </header>
+
+        <section class="pf-gallery" id="liveGallery">
+          <!-- Dynamic cards go here -->
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Initial State
+    let projects = [
+      {
+        id: 1,
+        title: "Nocturne in Terracotta",
+        category: "Ceramics & Light",
+        desc: "Hand-thrown earthen clay vessels mounted with warm low-voltage internal glow.",
+        image: "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: 2,
+        title: "Tidal Pavilion Studies",
+        category: "Mixed Media",
+        desc: "Studies exploring weathered drift timber, unpolished brass hardware, and salt spray patinas.",
+        image: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=1200&q=80"
+      },
+      {
+        id: 3,
+        title: "Canopy Shadow Play",
+        category: "Spatial Installation",
+        desc: "Laser-cut perforated panels casting geometric solar projections across concrete interiors.",
+        image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1200&q=80"
+      }
+    ];
+
+    // DOM Elements
+    const themeSelect = document.getElementById('themeSelect');
+    const inputTagline = document.getElementById('inputTagline');
+    const inputName = document.getElementById('inputName');
+    const inputBio = document.getElementById('inputBio');
+    const inputContact = document.getElementById('inputContact');
+
+    const liveTagline = document.getElementById('liveTagline');
+    const liveName = document.getElementById('liveName');
+    const liveBio = document.getElementById('liveBio');
+    const liveContactLink = document.getElementById('liveContactLink');
+    const liveGallery = document.getElementById('liveGallery');
+    const projectsEditorContainer = document.getElementById('projectsEditorContainer');
+    const addProjectBtn = document.getElementById('addProjectBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const previewModeBtn = document.getElementById('previewModeBtn');
+
+    // Live Sync Inputs
+    inputTagline.addEventListener('input', (e) => { liveTagline.innerText = e.target.value; });
+    inputName.addEventListener('input', (e) => { liveName.innerText = e.target.value; });
+    inputBio.addEventListener('input', (e) => { liveBio.innerText = e.target.value; });
+    inputContact.addEventListener('input', (e) => { 
+      liveContactLink.innerText = e.target.value.includes('@') ? 'Contact: ' + e.target.value : 'Visit Website';
+      liveContactLink.href = e.target.value.includes('@') ? `mailto:${e.target.value}` : e.target.value;
+    });
+
+    themeSelect.addEventListener('change', (e) => {
+      document.body.className = e.target.value;
+    });
+
+    // Render Form & Live Gallery
+    function renderProjects() {
+      // 1. Render Live Canvas
+      liveGallery.innerHTML = projects.map(p => `
+        <article class="pf-item">
+          <div class="pf-img-wrapper">
+            <img src="${p.image}" alt="${p.title}" loading="lazy" />
+          </div>
+          <div class="pf-item-meta">
+            <h3 class="pf-item-title">${p.title || 'Untitled Work'}</h3>
+            <span class="pf-item-category">${p.category || 'Discipline'}</span>
+          </div>
+          <p class="pf-item-desc">${p.desc || ''}</p>
+        </article>
+      `).join('');
+
+      // 2. Render Editor Cards
+      projectsEditorContainer.innerHTML = projects.map((p, idx) => `
+        <div class="project-card-form" data-id="${p.id}">
+          <button class="remove-project-btn" onclick="removeProject(${p.id})">&times;</button>
+          <div class="form-group">
+            <label>Title</label>
+            <input type="text" value="${p.title}" oninput="updateProject(${p.id}, 'title', this.value)" />
+          </div>
+          <div class="form-group">
+            <label>Medium / Category</label>
+            <input type="text" value="${p.category}" oninput="updateProject(${p.id}, 'category', this.value)" />
+          </div>
+          <div class="form-group">
+            <label>Image URL</label>
+            <input type="text" value="${p.image}" oninput="updateProject(${p.id}, 'image', this.value)" />
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Description</label>
+            <textarea oninput="updateProject(${p.id}, 'desc', this.value)">${p.desc}</textarea>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.updateProject = (id, field, value) => {
+      const proj = projects.find(p => p.id === id);
+      if (proj) {
+        proj[field] = value;
+        // Re-render live canvas without re-rendering active text inputs
+        const currentItem = liveGallery.children[projects.indexOf(proj)];
+        if (currentItem) {
+          if (field === 'title') currentItem.querySelector('.pf-item-title').innerText = value;
+          if (field === 'category') currentItem.querySelector('.pf-item-category').innerText = value;
+          if (field === 'desc') currentItem.querySelector('.pf-item-desc').innerText = value;
+          if (field === 'image') currentItem.querySelector('img').src = value;
+        }
+      }
+    };
+
+    window.removeProject = (id) => {
+      projects = projects.filter(p => p.id !== id);
+      renderProjects();
+    };
+
+    addProjectBtn.addEventListener('click', () => {
+      projects.push({
+        id: Date.now(),
+        title: "New Exploration",
+        category: "Creative Craft",
+        desc: "Brief conceptual summary of the piece, medium, and execution.",
+        image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?auto=format&fit=crop&w=1200&q=80"
+      });
+      renderProjects();
+    });
+
+    // Fullscreen Preview Toggle
+    let isPreview = false;
+    previewModeBtn.addEventListener('click', () => {
+      isPreview = !isPreview;
+      document.querySelector('.editor-pane').style.display = isPreview ? 'none' : 'flex';
+      document.querySelector('main').style.gridTemplateColumns = isPreview ? '1fr' : '440px 1fr';
+      previewModeBtn.innerText = isPreview ? 'Back to Editor' : 'Preview Fullscreen';
+    });
+
+    // Export Functionality
+    exportBtn.addEventListener('click', () => {
+      const currentTheme = themeSelect.value;
+      const themeColor = currentTheme === 'theme-warm' ? '#C9654B' : (currentTheme === 'theme-sage' ? '#648169' : '#111111');
+      const themeBg = currentTheme === 'theme-warm' ? '#FAF6F0' : (currentTheme === 'theme-sage' ? '#F5F7F5' : '#F5F5F5');
+
+      const standaloneHTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${inputName.value} — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Plus+Jakarta+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: ${themeBg};
+      color: #1F1E1C;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      padding: 0;
+      line-height: 1.6;
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 6rem 2rem; }
+    header { margin-bottom: 5rem; }
+    .tagline { font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 600; color: ${themeColor}; margin-bottom: 1rem; }
+    .name { font-family: 'Italiana', serif; font-size: clamp(3rem, 7vw, 5rem); line-height: 1.05; font-weight: 400; margin-bottom: 1.5rem; }
+    .bio { font-size: 1.2rem; color: #4A4843; max-width: 650px; font-weight: 300; margin-bottom: 2rem; }
+    .links a { color: #1F1E1C; text-decoration: none; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid #1F1E1C; padding-bottom: 2px; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 3.5rem 2.5rem; }
+    .item { display: flex; flex-direction: column; gap: 0.8rem; }
+    .img-box { width: 100%; aspect-ratio: 4/3; background: #EEE; overflow: hidden; border-radius: 4px; }
+    .img-box img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .img-box img:hover { transform: scale(1.03); }
+    .meta { display: flex; justify-content: space-between; align-items: baseline; margin-top: 0.5rem; }
+    .item-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 500; }
+    .category { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.15em; color: #73706A; }
+    .desc { font-size: 0.88rem; color: #615E58; }
+    footer { text-align: center; margin-top: 8rem; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: #888; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="tagline">${inputTagline.value}</div>
+      <h1 class="name">${inputName.value}</h1>
+      <p class="bio">${inputBio.value}</p>
+      <div class="links">
+        <a href="${inputContact.value.includes('@') ? 'mailto:' + inputContact.value : inputContact.value}">${inputContact.value.includes('@') ? 'Get in touch' : 'Visit Contact Link'}</a>
+      </div>
+    </header>
+    <main class="gallery">
+      ${projects.map(p => `
+        <article class="item">
+          <div class="img-box"><img src="${p.image}" alt="${p.title}"></div>
+          <div class="meta">
+            <h2 class="item-title">${p.title}</h2>
+            <span class="category">${p.category}</span>
+          </div>
+          <p class="desc">${p.desc}</p>
+        </article>
+      `).join('')}
+    </main>
+    <footer>&copy; ${new Date().getFullYear()} ${inputName.value}. All Rights Reserved.</footer>
+  </div>
+</body>
+</html>`;
+
+      const blob = new Blob([standaloneHTML], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'index.html';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Run Initial Setup
+    renderProjects();
+    inputContact.dispatchEvent(new Event('input'));
+  </script>
+</body>
+</html>
